@@ -11,7 +11,8 @@ export default async function TeamsPage() {
   let authenticated = false;
   if (token) {
     try {
-      authenticated = await findAdminSession(token);
+      const session = await findAdminSession(token);
+      authenticated = !!session;
     } catch (error) {
       console.error("Error checking admin session:", error);
     }

@@ -13,13 +13,39 @@ export type Task = {
   resources: string[];
 };
 
+export type Tenant = {
+  id: string;
+  name: string;
+  adminUsername: string;
+  adminPassword: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Team = {
   id: string;
   name: string;
   username: string;
   password: string;
+  tenantId: string | null;
   createdAt: string;
 };
+
+export type LearningMaterial = {
+  id: string;
+  title: string;
+  description: string | null;
+  module: "ai" | "cybersecurity";
+  fileUrl: string;
+  fileName: string;
+  fileType: "pdf" | "doc" | "docx";
+  fileSize: number | null;
+  uploadedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminType = "super" | "tenant";
 
 export type Assignment = {
   id: string;
@@ -51,6 +77,8 @@ export type AssignmentWithTask = Assignment & {
 
 type AdminSession = {
   token: string;
+  adminType: AdminType;
+  tenantId: string | null;
   createdAt: string;
 };
 
@@ -405,6 +433,7 @@ const mapTeamRow = (row: any): Team => ({
   name: row.name,
   username: row.username,
   password: row.password,
+  tenantId: row.tenantId || null,
   createdAt: row.createdAt,
 });
 
@@ -458,7 +487,7 @@ const makeCredentials = (teamName: string) => {
   return { username, password };
 };
 
-export const createTeam = async (name: string) => {
+export const createTeam = async (name: string, tenantId?: string | null) => {
   const { username, password } = makeCredentials(name);
 
   const team: Team = {
@@ -466,13 +495,14 @@ export const createTeam = async (name: string) => {
     name,
     username,
     password,
+    tenantId: tenantId || null,
     createdAt: new Date().toISOString(),
   };
 
   const db = await getDb();
   await db`
-    INSERT INTO teams (id, name, username, password, "createdAt")
-    VALUES (${team.id}, ${team.name}, ${team.username}, ${team.password}, ${team.createdAt})
+    INSERT INTO teams (id, name, username, password, "tenantId", "createdAt")
+    VALUES (${team.id}, ${team.name}, ${team.username}, ${team.password}, ${team.tenantId}, ${team.createdAt})
   `;
 
   return team;
@@ -1348,32 +1378,44 @@ export const upsertSubmission = async ({
   return submission;
 };
 
-export const createAdminSession = async (): Promise<AdminSession> => {
+export const createAdminSession = async (adminType: AdminType = "super", tenantId: string | null = null): Promise<AdminSession> => {
   const session: AdminSession = {
     token: crypto.randomUUID(),
+    adminType,
+    tenantId,
     createdAt: new Date().toISOString(),
   };
 
   const db = await getDb();
   await db`
-    INSERT INTO admin_sessions (token, "createdAt")
-    VALUES (${session.token}, ${session.createdAt})
+    INSERT INTO admin_sessions (token, "adminType", "tenantId", "createdAt")
+    VALUES (${session.token}, ${session.adminType}, ${session.tenantId}, ${session.createdAt})
   `;
 
   return session;
 };
 
-export const findAdminSession = async (token: string): Promise<boolean> => {
+export const findAdminSession = async (token: string): Promise<AdminSession | null> => {
   if (!token) {
-    return false;
+    return null;
   }
 
   const db = await getDb();
   const result = await db`
-    SELECT token FROM admin_sessions WHERE token = ${token} LIMIT 1
+    SELECT token, "adminType", "tenantId", "createdAt" FROM admin_sessions WHERE token = ${token} LIMIT 1
   `;
 
-  return result.rows.length > 0;
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+  return {
+    token: row.token,
+    adminType: (row.adminType || "super") as AdminType,
+    tenantId: row.tenantId || null,
+    createdAt: row.createdAt,
+  };
 };
 
 export const deleteAdminSession = async (token: string) => {
@@ -1386,3 +1428,226 @@ export const deleteAdminSession = async (token: string) => {
     DELETE FROM admin_sessions WHERE token = ${token}
   `;
 };
+
+// Tenant Management Functions
+const makeTenantCredentials = (tenantName: string) => {
+  const base = tenantName
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "")
+    .slice(0, 8);
+  const suffix = Math.floor(Math.random() * 10_000)
+    .toString()
+    .padStart(4, "0");
+  const username = `${base || "tenant"}${suffix}`;
+
+  const password = crypto.randomBytes(6).toString("hex");
+  return { username, password };
+};
+
+export const createTenant = async (name: string): Promise<Tenant> => {
+  const { username, password } = makeTenantCredentials(name);
+  const now = new Date().toISOString();
+
+  const tenant: Tenant = {
+    id: crypto.randomUUID(),
+    name,
+    adminUsername: username,
+    adminPassword: password,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const db = await getDb();
+  await db`
+    INSERT INTO tenants (id, name, "adminUsername", "adminPassword", "createdAt", "updatedAt")
+    VALUES (${tenant.id}, ${tenant.name}, ${tenant.adminUsername}, ${tenant.adminPassword}, ${tenant.createdAt}, ${tenant.updatedAt})
+  `;
+
+  return tenant;
+};
+
+export const listTenants = async (): Promise<Tenant[]> => {
+  const db = await getDb();
+  const result = await db`
+    SELECT * FROM tenants ORDER BY "createdAt" DESC
+  `;
+
+  return result.rows.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    adminUsername: row.adminUsername,
+    adminPassword: row.adminPassword,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }));
+};
+
+export const findTenantById = async (tenantId: string): Promise<Tenant | null> => {
+  const db = await getDb();
+  const result = await db`
+    SELECT * FROM tenants WHERE id = ${tenantId} LIMIT 1
+  `;
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+  return {
+    id: row.id,
+    name: row.name,
+    adminUsername: row.adminUsername,
+    adminPassword: row.adminPassword,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+};
+
+export const findTenantByAdminCredentials = async (username: string, password: string): Promise<Tenant | null> => {
+  const db = await getDb();
+  const result = await db`
+    SELECT * FROM tenants WHERE "adminUsername" = ${username} AND "adminPassword" = ${password} LIMIT 1
+  `;
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+  return {
+    id: row.id,
+    name: row.name,
+    adminUsername: row.adminUsername,
+    adminPassword: row.adminPassword,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+};
+
+export const deleteTenant = async (tenantId: string): Promise<void> => {
+  const db = await getDb();
+  
+  // Check if tenant exists
+  const tenantResult = await db`
+    SELECT id FROM tenants WHERE id = ${tenantId}
+  `;
+  
+  if (tenantResult.rows.length === 0) {
+    throw new Error("Tenant not found");
+  }
+
+  // Delete the tenant (cascade deletes will handle teams)
+  await db`
+    DELETE FROM tenants WHERE id = ${tenantId}
+  `;
+};
+
+// Learning Material Functions
+export const createLearningMaterial = async (
+  title: string,
+  description: string | null,
+  module: "ai" | "cybersecurity",
+  fileUrl: string,
+  fileName: string,
+  fileType: "pdf" | "doc" | "docx",
+  fileSize: number | null,
+  uploadedBy: string | null
+): Promise<LearningMaterial> => {
+  const now = new Date().toISOString();
+
+  const material: LearningMaterial = {
+    id: crypto.randomUUID(),
+    title,
+    description,
+    module,
+    fileUrl,
+    fileName,
+    fileType,
+    fileSize,
+    uploadedBy,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const db = await getDb();
+  await db`
+    INSERT INTO learning_materials (id, title, description, module, "fileUrl", "fileName", "fileType", "fileSize", "uploadedBy", "createdAt", "updatedAt")
+    VALUES (${material.id}, ${material.title}, ${material.description}, ${material.module}, ${material.fileUrl}, ${material.fileName}, ${material.fileType}, ${material.fileSize}, ${material.uploadedBy}, ${material.createdAt}, ${material.updatedAt})
+  `;
+
+  return material;
+};
+
+export const listLearningMaterials = async (module?: "ai" | "cybersecurity"): Promise<LearningMaterial[]> => {
+  const db = await getDb();
+  
+  let result;
+  if (module) {
+    result = await db`
+      SELECT * FROM learning_materials WHERE module = ${module} ORDER BY "createdAt" DESC
+    `;
+  } else {
+    result = await db`
+      SELECT * FROM learning_materials ORDER BY "createdAt" DESC
+    `;
+  }
+
+  return result.rows.map((row: any) => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    module: row.module as "ai" | "cybersecurity",
+    fileUrl: row.fileUrl,
+    fileName: row.fileName,
+    fileType: row.fileType as "pdf" | "doc" | "docx",
+    fileSize: row.fileSize,
+    uploadedBy: row.uploadedBy,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }));
+};
+
+export const findLearningMaterialById = async (materialId: string): Promise<LearningMaterial | null> => {
+  const db = await getDb();
+  const result = await db`
+    SELECT * FROM learning_materials WHERE id = ${materialId} LIMIT 1
+  `;
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    module: row.module as "ai" | "cybersecurity",
+    fileUrl: row.fileUrl,
+    fileName: row.fileName,
+    fileType: row.fileType as "pdf" | "doc" | "docx",
+    fileSize: row.fileSize,
+    uploadedBy: row.uploadedBy,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+};
+
+export const deleteLearningMaterial = async (materialId: string): Promise<void> => {
+  const db = await getDb();
+  
+  // Check if material exists
+  const materialResult = await db`
+    SELECT id FROM learning_materials WHERE id = ${materialId}
+  `;
+  
+  if (materialResult.rows.length === 0) {
+    throw new Error("Learning material not found");
+  }
+
+  // Delete the learning material
+  await db`
+    DELETE FROM learning_materials WHERE id = ${materialId}
+  `;
+};
+

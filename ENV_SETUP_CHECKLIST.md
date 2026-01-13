@@ -25,7 +25,18 @@ Since you copied this project from another hackathon, you need to update environ
 ADMIN_USERNAME=ai_admin
 ADMIN_PASSWORD=your_secure_password_here
 POSTGRES_URL=your_postgres_connection_string_here
+BLOB_READ_WRITE_TOKEN=your_vercel_blob_token_here
 ```
+
+### 3. Vercel Blob Storage Token (REQUIRED for File Uploads)
+
+**To get the token:**
+1. Go to Vercel Dashboard → Your Project → Storage
+2. Create a Blob store (if not exists)
+3. Copy the `BLOB_READ_WRITE_TOKEN` from environment variables
+4. Add it to `.env.local` and Vercel project settings
+
+**Without this token, file uploads will fail!**
 
 **Vercel Deployment:**
 1. Go to Vercel project settings → Environment Variables
@@ -34,7 +45,7 @@ POSTGRES_URL=your_postgres_connection_string_here
    - `ADMIN_PASSWORD` (use different value than old project)
    - `POSTGRES_URL` (point to new database or same if sharing)
 
-### 3. Port Numbers (Already Updated)
+### 4. Port Numbers (Already Updated)
 
 ✅ Port numbers have been changed in `package.json`:
 - Development: Port **3004** (was 3003)
@@ -51,6 +62,7 @@ This prevents conflicts if you run both projects simultaneously.
    ADMIN_USERNAME=ai_admin
    ADMIN_PASSWORD=your_secure_password_here
    POSTGRES_URL=postgres://user:password@host:port/database?sslmode=require
+   BLOB_READ_WRITE_TOKEN=your_vercel_blob_token_here
    ```
 
 2. **Clear old database files** (if using SQLite):
@@ -70,15 +82,22 @@ This prevents conflicts if you run both projects simultaneously.
    - Go to https://vercel.com/dashboard
    - Create new project or select existing
 
-2. **Set Environment Variables**:
+2. **Create Blob Store** (for file uploads):
+   - Go to Storage tab
+   - Create Database → Blob
+   - Name it (e.g., "learning-materials")
+   - Copy the `BLOB_READ_WRITE_TOKEN`
+
+3. **Set Environment Variables**:
    - Settings → Environment Variables
    - Add/Update:
      - `POSTGRES_URL` (your database connection string)
      - `ADMIN_USERNAME` (different from old project)
      - `ADMIN_PASSWORD` (different from old project)
+     - `BLOB_READ_WRITE_TOKEN` (from Blob store)
    - Enable for: Production, Preview, Development
 
-3. **Redeploy**:
+4. **Redeploy**:
    - Go to Deployments tab
    - Click "..." → "Redeploy"
 

@@ -3,15 +3,14 @@ import { redirect } from "next/navigation";
 
 import { ADMIN_SESSION_COOKIE } from "@/lib/admin-auth";
 import { findAdminSession } from "@/lib/store";
-import { HomeClient } from "./HomeClient";
-import { LandingPage } from "./components/LandingPage";
+import { HomeClient } from "../HomeClient";
 
 // Force dynamic rendering since we use cookies()
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function Page() {
-  // Check if user is authenticated
+export default async function SignInPage() {
+  // Force unauthenticated by default - require explicit login
   let authenticated = false;
   
   try {
@@ -45,20 +44,26 @@ export default async function Page() {
       }
     }
 
-    // If authenticated, show admin dashboard
+    // If authenticated, redirect to home (admin dashboard)
     if (authenticated) {
-      return (
-        <HomeClient
-          initialAdminStatus="authenticated"
-        />
-      );
+      redirect("/");
     }
 
-    // If not authenticated, show landing page
-    return <LandingPage />;
+    // Always render the sign-in page, even if authentication check failed
+    return (
+      <HomeClient
+        initialAdminStatus="unauthenticated"
+      />
+    );
   } catch (error) {
-    // If anything fails, show landing page
+    // If anything fails, always render as unauthenticated
+    // Never throw - always render something
     console.error("Page render error:", error);
-    return <LandingPage />;
+    return (
+      <HomeClient
+        initialAdminStatus="unauthenticated"
+      />
+    );
   }
 }
+

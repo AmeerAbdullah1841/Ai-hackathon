@@ -174,7 +174,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
 
   const fetchAdminSession = useCallback(async () => {
     try {
-      const session = await request<{ authenticated: boolean }>(
+      const session = await request<{ authenticated: boolean; adminType?: string; tenantId?: string | null }>(
         "/api/admin/session",
       );
       setAdminStatus(session.authenticated ? "authenticated" : "unauthenticated");
@@ -262,13 +262,30 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
     setAdminLoading(true);
 
     try {
-      await request("/api/admin/login", {
-        method: "POST",
-        headers: jsonHeaders,
-        body: JSON.stringify(adminLogin),
-      });
-      setAdminStatus("authenticated");
-      refreshDashboard();
+      // Try super admin login first
+      try {
+        await request("/api/admin/login", {
+          method: "POST",
+          headers: jsonHeaders,
+          body: JSON.stringify(adminLogin),
+        });
+        setAdminStatus("authenticated");
+        refreshDashboard();
+        return;
+      } catch (superAdminError) {
+        // If super admin login fails, try tenant admin login
+        const tenantResponse = await request<{ authenticated: boolean; tenantId?: string }>("/api/tenant/login", {
+          method: "POST",
+          headers: jsonHeaders,
+          body: JSON.stringify(adminLogin),
+        });
+        if (tenantResponse.authenticated) {
+          setAdminStatus("authenticated");
+          refreshDashboard();
+          return;
+        }
+        throw superAdminError;
+      }
     } catch (error) {
       setAdminStatus("unauthenticated");
       setAdminError(error instanceof Error ? error.message : "Login failed");
@@ -286,7 +303,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
       console.error(error);
     } finally {
       setAdminStatus("unauthenticated");
-      router.push("/");
+      router.push("/signin");
     }
   };
 
@@ -816,7 +833,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
+    <div className="min-h-screen bg-slate-100 px-4 pt-24 pb-10 text-slate-900">
       <div className="mx-auto flex max-w-7xl items-start gap-6">
         <AdminSidebar onLogout={handleAdminLogout} />
         <div className="flex-1 space-y-10">

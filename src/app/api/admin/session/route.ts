@@ -8,8 +8,15 @@ export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value ?? "";
-    const authenticated = await findAdminSession(token);
-    return NextResponse.json({ authenticated });
+    const session = await findAdminSession(token);
+    if (!session) {
+      return NextResponse.json({ authenticated: false });
+    }
+    return NextResponse.json({ 
+      authenticated: true,
+      adminType: session.adminType,
+      tenantId: session.tenantId 
+    });
   } catch (error) {
     console.error("Session check error:", error);
     return NextResponse.json({ authenticated: false }, { status: 200 });

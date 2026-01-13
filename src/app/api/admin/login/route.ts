@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const session = await createAdminSession();
+    const session = await createAdminSession("super", null);
     const response = NextResponse.json({ authenticated: true });
 
     response.cookies.set({
