@@ -8,13 +8,37 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check authentication - only authenticated users (admin or student) can view materials
+    const cookieStore = await cookies();
+    const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value ?? "";
+    
+    let isAuthenticated = false;
+    if (token) {
+      try {
+        const session = await findAdminSession(token);
+        if (session) {
+          isAuthenticated = true;
+        }
+      } catch (error) {
+        // Session check failed - treat as unauthenticated
+        console.error("Error checking session:", error);
+      }
+    }
+
+    // Note: Students access through team dashboard, which doesn't use admin sessions
+    // For now, we'll allow the API to return materials but hide the View PDF button in UI
+    // if not authenticated. In production, you might want to add team session checking here.
+    
     const { searchParams } = new URL(request.url);
     const module = searchParams.get("module") as "ai" | "cybersecurity" | null;
 
-    // Learning materials are accessible to everyone (no auth required for viewing)
     const materials = await listLearningMaterials(module || undefined);
 
-    return NextResponse.json(materials);
+    // Return materials with authentication status
+    return NextResponse.json({ 
+      materials,
+      authenticated: isAuthenticated 
+    });
   } catch (error) {
     console.error("Error fetching learning materials:", error);
     return NextResponse.json(

@@ -30,18 +30,53 @@ async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export function LearningClient({ isSuperAdmin }: { isSuperAdmin: boolean }) {
+export function LearningClient({ isSuperAdmin, isAuthenticated: initialIsAuthenticated }: { isSuperAdmin: boolean; isAuthenticated?: boolean }) {
   const [materials, setMaterials] = useState<LearningMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedModule, setSelectedModule] = useState<"ai" | "cybersecurity" | "all">("all");
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(initialIsAuthenticated ?? false);
+
+  // Check authentication status
+  useEffect(() => {
+    fetch("/api/admin/session")
+      .then((res) => res.json())
+      .then((data) => {
+        setIsAuthenticated(data.authenticated === true);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      });
+  }, []);
 
   const fetchMaterials = useCallback(async () => {
     try {
       setLoading(true);
       const moduleParam = selectedModule === "all" ? "" : `?module=${selectedModule}`;
-      const data = await request<LearningMaterial[]>(`/api/learning${moduleParam}`);
-      setMaterials(data);
+      const response = await fetch(`/api/learning${moduleParam}`, {
+        credentials: "include",
+        cache: "no-store",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch learning materials");
+      }
+      
+      const data = await response.json();
+      
+      // Handle both old format (array) and new format (object with materials and authenticated)
+      let materialsArray: LearningMaterial[] = [];
+      if (Array.isArray(data)) {
+        materialsArray = data;
+      } else if (data && typeof data === 'object') {
+        materialsArray = Array.isArray(data.materials) ? data.materials : [];
+        if (data.authenticated !== undefined) {
+          setIsAuthenticated(data.authenticated);
+        }
+      }
+      
+      // Ensure materials is always an array
+      setMaterials(materialsArray);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch learning materials");
@@ -76,9 +111,12 @@ export function LearningClient({ isSuperAdmin }: { isSuperAdmin: boolean }) {
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   };
 
-  const filteredMaterials = selectedModule === "all" 
-    ? materials 
-    : materials.filter((m) => m.module === selectedModule);
+  // Ensure filteredMaterials is always an array
+  const filteredMaterials = Array.isArray(materials)
+    ? (selectedModule === "all" 
+        ? materials 
+        : materials.filter((m) => m.module === selectedModule))
+    : [];
 
   return (
     <div className="space-y-6">
@@ -196,51 +234,63 @@ export function LearningClient({ isSuperAdmin }: { isSuperAdmin: boolean }) {
                   )}
                 </div>
                 <div className="mt-4">
-                  {material.fileType === "pdf" ? (
-                    <a
-                      href={material.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="h-4 w-4"
+                  {isAuthenticated ? (
+                    material.fileType === "pdf" ? (
+                      <a
+                        href={material.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                        />
-                      </svg>
-                      View PDF
-                    </a>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="h-4 w-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                          />
+                        </svg>
+                        View PDF
+                      </a>
+                    ) : (
+                      <a
+                        href={material.fileUrl}
+                        download={material.fileName}
+                        className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="h-4 w-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                          />
+                        </svg>
+                        Download
+                      </a>
+                    )
                   ) : (
-                    <a
-                      href={material.fileUrl}
-                      download={material.fileName}
-                      className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="h-4 w-4"
+                    <div className="rounded-lg bg-slate-100 px-4 py-2 text-sm text-slate-600 text-center">
+                      <p className="text-xs mb-1">Sign in required</p>
+                      <a
+                        href="/signin"
+                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 underline"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                        />
-                      </svg>
-                      Download
-                    </a>
+                        Sign In to Access
+                      </a>
+                    </div>
                   )}
                 </div>
               </div>

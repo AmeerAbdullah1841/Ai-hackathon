@@ -41,7 +41,7 @@ export function LearningPageClient({ isSuperAdmin }: Props) {
       <div className="mx-auto flex max-w-7xl gap-6">
         <AdminSidebar onLogout={handleAdminLogout} />
         <div className="flex-1">
-          <LearningClient isSuperAdmin={isSuperAdmin} />
+          <LearningClient isSuperAdmin={isSuperAdmin} isAuthenticated={true} />
         </div>
       </div>
     </div>

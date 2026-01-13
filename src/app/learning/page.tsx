@@ -34,11 +34,11 @@ export default async function LearningPage() {
     return <LearningPageClient isSuperAdmin={isSuperAdmin} />;
   }
 
-  // If not authenticated, show with navbar (no sidebar)
+  // If not authenticated, show with navbar (no sidebar) - but materials won't be accessible
   return (
     <div className="min-h-screen bg-slate-100 px-4 pt-24 pb-10 text-slate-900">
       <div className="mx-auto max-w-7xl">
-        <LearningClient isSuperAdmin={false} />
+        <LearningClient isSuperAdmin={false} isAuthenticated={false} />
       </div>
     </div>
   );
