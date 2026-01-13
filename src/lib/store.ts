@@ -986,6 +986,7 @@ export const listSubmissionsWithDetails = async (): Promise<SubmissionWithDetail
       t.id as "teamId",
       t.name as "teamName",
       t.username as "teamUsername",
+      t."tenantId" as "teamTenantId",
       t."createdAt" as "teamCreatedAt",
       task.id as "taskId",
       task.title as "taskTitle",
@@ -1027,6 +1028,7 @@ export const listSubmissionsWithDetails = async (): Promise<SubmissionWithDetail
           name: row.teamName,
           username: row.teamUsername,
           password: "",
+          tenantId: row.teamTenantId,
           createdAt: row.teamCreatedAt,
         }
       : undefined,
