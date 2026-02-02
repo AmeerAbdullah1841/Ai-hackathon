@@ -64,13 +64,14 @@ export function Navbar() {
               href="/learning"
               className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
             >
-              Learning
+              Learning Materials
             </Link>
+          
             <Link
-              href="/leaderboard"
+              href="/pricing"
               className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
             >
-              Leaderboard
+              Pricing
             </Link>
           </div>
 
