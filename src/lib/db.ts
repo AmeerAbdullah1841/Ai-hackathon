@@ -131,6 +131,32 @@ const initializeSchema = async () => {
       )
     `);
 
+    // Add Stripe subscription columns if they don't exist
+    const stripeColumns = [
+      { name: 'stripeCustomerId', type: 'TEXT' },
+      { name: 'stripeSubscriptionId', type: 'TEXT' },
+      { name: 'subscriptionStatus', type: 'TEXT' },
+      { name: 'billingPeriod', type: 'TEXT' },
+      { name: 'subscriptionStartDate', type: 'TEXT' },
+      { name: 'subscriptionEndDate', type: 'TEXT' },
+      { name: 'adminEmail', type: 'TEXT' },
+      { name: 'adminName', type: 'TEXT' }
+    ];
+
+    for (const column of stripeColumns) {
+      try {
+        const columnExists = await pool.query(`
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name='tenants' AND column_name='${column.name}'
+        `);
+        if (columnExists.rows.length === 0) {
+          await pool.query(`ALTER TABLE tenants ADD COLUMN "${column.name}" ${column.type}`);
+        }
+      } catch (error) {
+        console.log(`Note: ${column.name} column may already exist in tenants table`);
+      }
+    }
+
     // Create teams table (without foreign key first)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS teams (

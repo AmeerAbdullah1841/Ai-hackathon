@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-10 pt-24">
@@ -18,6 +20,22 @@ export function LandingPage() {
         <p className="text-base md:text-lg text-slate-400 mb-12 max-w-xl mx-auto">
           Join the ultimate AI hackathon experience. Test your skills, solve challenging problems, and climb the leaderboard.
         </p>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <Link
+            href="/pricing"
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-lg"
+          >
+            Get Started
+          </Link>
+          <Link
+            href="/signin"
+            className="px-8 py-4 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-colors text-lg"
+          >
+            Sign In
+          </Link>
+        </div>
         
         {/* Additional Info */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">

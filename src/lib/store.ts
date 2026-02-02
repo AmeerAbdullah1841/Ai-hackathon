@@ -20,6 +20,14 @@ export type Tenant = {
   adminPassword: string;
   createdAt: string;
   updatedAt: string;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  subscriptionStatus?: string | null;
+  billingPeriod?: string | null;
+  subscriptionStartDate?: string | null;
+  subscriptionEndDate?: string | null;
+  adminEmail?: string | null;
+  adminName?: string | null;
 };
 
 export type Team = {
@@ -1446,7 +1454,18 @@ const makeTenantCredentials = (tenantName: string) => {
   return { username, password };
 };
 
-export const createTenant = async (name: string): Promise<Tenant> => {
+export const createTenant = async (
+  name: string,
+  options?: {
+    adminEmail?: string;
+    adminName?: string;
+    stripeCustomerId?: string;
+    stripeSubscriptionId?: string;
+    billingPeriod?: string;
+    subscriptionStartDate?: string;
+    subscriptionEndDate?: string;
+  }
+): Promise<Tenant> => {
   const { username, password } = makeTenantCredentials(name);
   const now = new Date().toISOString();
 
@@ -1457,12 +1476,30 @@ export const createTenant = async (name: string): Promise<Tenant> => {
     adminPassword: password,
     createdAt: now,
     updatedAt: now,
+    stripeCustomerId: options?.stripeCustomerId || null,
+    stripeSubscriptionId: options?.stripeSubscriptionId || null,
+    subscriptionStatus: options?.stripeSubscriptionId ? "active" : null,
+    billingPeriod: options?.billingPeriod || null,
+    subscriptionStartDate: options?.subscriptionStartDate || null,
+    subscriptionEndDate: options?.subscriptionEndDate || null,
+    adminEmail: options?.adminEmail || null,
+    adminName: options?.adminName || null,
   };
 
   const db = await getDb();
   await db`
-    INSERT INTO tenants (id, name, "adminUsername", "adminPassword", "createdAt", "updatedAt")
-    VALUES (${tenant.id}, ${tenant.name}, ${tenant.adminUsername}, ${tenant.adminPassword}, ${tenant.createdAt}, ${tenant.updatedAt})
+    INSERT INTO tenants (
+      id, name, "adminUsername", "adminPassword", "createdAt", "updatedAt",
+      "stripeCustomerId", "stripeSubscriptionId", "subscriptionStatus", "billingPeriod",
+      "subscriptionStartDate", "subscriptionEndDate", "adminEmail", "adminName"
+    )
+    VALUES (
+      ${tenant.id}, ${tenant.name}, ${tenant.adminUsername}, ${tenant.adminPassword},
+      ${tenant.createdAt}, ${tenant.updatedAt},
+      ${tenant.stripeCustomerId}, ${tenant.stripeSubscriptionId}, ${tenant.subscriptionStatus},
+      ${tenant.billingPeriod}, ${tenant.subscriptionStartDate}, ${tenant.subscriptionEndDate},
+      ${tenant.adminEmail}, ${tenant.adminName}
+    )
   `;
 
   return tenant;
@@ -1481,6 +1518,14 @@ export const listTenants = async (): Promise<Tenant[]> => {
     adminPassword: row.adminPassword,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    stripeCustomerId: row.stripeCustomerId || null,
+    stripeSubscriptionId: row.stripeSubscriptionId || null,
+    subscriptionStatus: row.subscriptionStatus || null,
+    billingPeriod: row.billingPeriod || null,
+    subscriptionStartDate: row.subscriptionStartDate || null,
+    subscriptionEndDate: row.subscriptionEndDate || null,
+    adminEmail: row.adminEmail || null,
+    adminName: row.adminName || null,
   }));
 };
 
@@ -1502,6 +1547,14 @@ export const findTenantById = async (tenantId: string): Promise<Tenant | null> =
     adminPassword: row.adminPassword,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    stripeCustomerId: row.stripeCustomerId || null,
+    stripeSubscriptionId: row.stripeSubscriptionId || null,
+    subscriptionStatus: row.subscriptionStatus || null,
+    billingPeriod: row.billingPeriod || null,
+    subscriptionStartDate: row.subscriptionStartDate || null,
+    subscriptionEndDate: row.subscriptionEndDate || null,
+    adminEmail: row.adminEmail || null,
+    adminName: row.adminName || null,
   };
 };
 
@@ -1523,7 +1576,50 @@ export const findTenantByAdminCredentials = async (username: string, password: s
     adminPassword: row.adminPassword,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    stripeCustomerId: row.stripeCustomerId || null,
+    stripeSubscriptionId: row.stripeSubscriptionId || null,
+    subscriptionStatus: row.subscriptionStatus || null,
+    billingPeriod: row.billingPeriod || null,
+    subscriptionStartDate: row.subscriptionStartDate || null,
+    subscriptionEndDate: row.subscriptionEndDate || null,
+    adminEmail: row.adminEmail || null,
+    adminName: row.adminName || null,
   };
+};
+
+export const updateTenantSubscription = async (
+  tenantId: string,
+  updates: {
+    subscriptionStatus?: string;
+    subscriptionEndDate?: string;
+  }
+): Promise<void> => {
+  const db = await getDb();
+  const updatedAt = new Date().toISOString();
+  
+  if (updates.subscriptionStatus !== undefined && updates.subscriptionEndDate !== undefined) {
+    await db`
+      UPDATE tenants 
+      SET "subscriptionStatus" = ${updates.subscriptionStatus},
+          "subscriptionEndDate" = ${updates.subscriptionEndDate},
+          "updatedAt" = ${updatedAt}
+      WHERE id = ${tenantId}
+    `;
+  } else if (updates.subscriptionStatus !== undefined) {
+    await db`
+      UPDATE tenants 
+      SET "subscriptionStatus" = ${updates.subscriptionStatus},
+          "updatedAt" = ${updatedAt}
+      WHERE id = ${tenantId}
+    `;
+  } else if (updates.subscriptionEndDate !== undefined) {
+    await db`
+      UPDATE tenants 
+      SET "subscriptionEndDate" = ${updates.subscriptionEndDate},
+          "updatedAt" = ${updatedAt}
+      WHERE id = ${tenantId}
+    `;
+  }
 };
 
 export const deleteTenant = async (tenantId: string): Promise<void> => {
