@@ -22,7 +22,6 @@ function PricingSuccessContent() {
   const [credentials, setCredentials] = useState<TenantCredentials | null>(null);
   const [signingIn, setSigningIn] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
 
   useEffect(() => {
     if (!sessionId) {
@@ -111,15 +110,6 @@ function PricingSuccessContent() {
       setSigningIn(false);
     }
   };
-
-  // Auto-login after credentials are loaded
-  useEffect(() => {
-    if (credentials && !autoLoginAttempted) {
-      setAutoLoginAttempted(true);
-      handleAutoLogin();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [credentials, autoLoginAttempted]);
 
   const handleManualSignIn = async () => {
     await handleAutoLogin();
@@ -259,14 +249,14 @@ function PricingSuccessContent() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>Signing you in automatically...</span>
+                <span>Signing you in...</span>
               </div>
             </div>
           )}
 
           {loginError && (
             <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg text-yellow-200">
-              <p className="font-semibold mb-1">Auto-login failed</p>
+              <p className="font-semibold mb-1">Sign in failed</p>
               <p className="text-sm">{loginError}</p>
             </div>
           )}
@@ -279,18 +269,18 @@ function PricingSuccessContent() {
                   disabled={signingIn}
                   className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
                 >
-                  {signingIn ? "Signing In..." : "Sign In Now & Access Dashboard"}
+                  {signingIn ? "Signing In..." : "Sign In & Access Dashboard"}
                 </button>
                 <div className="pt-2">
                   <Link
                     href="/signin"
                     className="text-blue-400 hover:text-blue-300 text-sm underline"
                   >
-                    Or sign in manually
+                    Or sign in manually using the credentials above
                   </Link>
                 </div>
                 <p className="mt-4 text-sm text-slate-400">
-                  You've been automatically signed in! You can now access your tenant admin dashboard, create teams, and manage your organization.
+                  Please save your credentials securely. Use the button above to sign in, or visit the sign in page to log in manually.
                 </p>
               </>
             )}

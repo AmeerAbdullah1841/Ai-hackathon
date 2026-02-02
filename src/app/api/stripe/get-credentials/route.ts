@@ -8,9 +8,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const dynamic = "force-dynamic";
 
-// Helper function to wait
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -60,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     console.log(`[GET-CREDENTIALS] Metadata - Tenant: ${tenantName}, Admin: ${adminName}, Email: ${adminEmail}, Period: ${billingPeriod}`);
 
-    // Find tenant by Stripe customer ID with retry logic
+    // Find tenant by Stripe customer ID
     const { getDb } = await import("@/lib/db.server");
     let db;
     try {
@@ -73,49 +70,27 @@ export async function GET(request: NextRequest) {
       );
     }
     
+    // Try to find tenant - use Promise.race with timeout to prevent hanging
     let result;
     try {
-      result = await db`
+      const queryPromise = db`
         SELECT * FROM tenants WHERE "stripeCustomerId" = ${customerId} LIMIT 1
       `;
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Database query timeout")), 5000)
+      );
+      
+      result = await Promise.race([queryPromise, timeoutPromise]) as any;
     } catch (queryError) {
       console.error("[GET-CREDENTIALS] Database query error:", queryError);
-      return NextResponse.json(
-        { error: `Database query failed: ${queryError instanceof Error ? queryError.message : "Unknown error"}` },
-        { status: 500 }
-      );
+      // Continue to create tenant if query fails or times out
+      result = { rows: [] };
     }
 
-    // If tenant not found, wait and retry (webhook might be processing)
+    // If tenant not found, create it directly (webhook might be delayed, but we have all the data)
     if (result.rows.length === 0) {
-      console.log("[GET-CREDENTIALS] Tenant not found, waiting for webhook...");
-      
-      // Retry up to 6 times with shorter delays (total ~10 seconds instead of 15)
-      for (let attempt = 0; attempt < 6; attempt++) {
-        const delay = attempt === 0 ? 500 : 1000 * attempt; // 0.5s, 1s, 2s, 3s, 4s, 5s
-        await wait(delay);
-        
-        console.log(`[GET-CREDENTIALS] Retry attempt ${attempt + 1}/6, checking for tenant...`);
-        
-        try {
-          result = await db`
-            SELECT * FROM tenants WHERE "stripeCustomerId" = ${customerId} LIMIT 1
-          `;
-        } catch (queryError) {
-          console.error(`[GET-CREDENTIALS] Retry ${attempt + 1} query error:`, queryError);
-          continue;
-        }
-        
-        if (result.rows.length > 0) {
-          console.log(`[GET-CREDENTIALS] ✅ Tenant found after ${attempt + 1} retry attempts`);
-          break;
-        }
-      }
-    }
-
-    // If still not found, create tenant directly (fallback if webhook failed or is delayed)
-    if (result.rows.length === 0) {
-      console.log("[GET-CREDENTIALS] Tenant still not found, creating tenant directly from session data...");
+      console.log("[GET-CREDENTIALS] Tenant not found, creating tenant directly from session data...");
       
       if (!tenantName || !adminName || !adminEmail || !billingPeriod) {
         console.error("[GET-CREDENTIALS] Missing required metadata:", { tenantName, adminName, adminEmail, billingPeriod });
@@ -141,15 +116,35 @@ export async function GET(request: NextRequest) {
           subscriptionStartDate: startDate,
           subscriptionEndDate: endDate,
         });
+        console.log(`[GET-CREDENTIALS] ✅ Tenant created directly: ${tenant.name}`);
       } catch (createError) {
         console.error("[GET-CREDENTIALS] Error creating tenant:", createError);
-        return NextResponse.json(
-          { error: `Failed to create tenant: ${createError instanceof Error ? createError.message : "Unknown error"}` },
-          { status: 500 }
-        );
+        
+        // If tenant creation failed, it might have been created by webhook in the meantime
+        // Try to find it again
+        try {
+          const retryResult = await db`
+            SELECT * FROM tenants WHERE "stripeCustomerId" = ${customerId} LIMIT 1
+          `;
+          
+          if (retryResult.rows.length > 0) {
+            console.log(`[GET-CREDENTIALS] ✅ Tenant found after creation attempt (created by webhook): ${retryResult.rows[0].name}`);
+            tenant = retryResult.rows[0];
+          } else {
+            // Tenant still not found and creation failed
+            return NextResponse.json(
+              { error: `Failed to create tenant: ${createError instanceof Error ? createError.message : "Unknown error"}` },
+              { status: 500 }
+            );
+          }
+        } catch (retryError) {
+          console.error("[GET-CREDENTIALS] Error retrying query after creation failure:", retryError);
+          return NextResponse.json(
+            { error: `Failed to create tenant: ${createError instanceof Error ? createError.message : "Unknown error"}` },
+            { status: 500 }
+          );
+        }
       }
-
-      console.log(`[GET-CREDENTIALS] ✅ Tenant created directly: ${tenant.name}`);
 
       return NextResponse.json({
         tenantName: tenant.name,
