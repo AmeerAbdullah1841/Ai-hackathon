@@ -302,6 +302,178 @@ const cybersecuritySeedTasks: Task[] = [
   },
 ];
 
+// AI Challenges Seed Tasks
+const aiSeedTasks: Task[] = [
+  {
+    id: "challenge-ai-house-price-prediction",
+    title: "Machine Learning: House Price Prediction",
+    category: "Machine Learning",
+    difficulty: "beginner",
+    description:
+      "Build a machine learning model to predict house prices based on features like size, bedrooms, bathrooms, and age. Use regression techniques to achieve the best accuracy. Submit your model's predictions and evaluation metrics. Access the interactive challenge at /challenges/ai-house-price-prediction",
+    flag: "flag{house_price_model_complete}",
+    points: 200,
+    resources: ["/challenges/ai-house-price-prediction"],
+  },
+  {
+    id: "challenge-ai-customer-churn",
+    title: "Machine Learning: Customer Churn Prediction",
+    category: "Machine Learning",
+    difficulty: "intermediate",
+    description:
+      "Predict which customers will churn using historical data. Build a classification model that identifies at-risk customers. Handle class imbalance and achieve high recall for churn detection. Submit your model with feature importance analysis. Access the interactive challenge at /challenges/ai-customer-churn",
+    flag: "flag{churn_prediction_complete}",
+    points: 250,
+    resources: ["/challenges/ai-customer-churn"],
+  },
+  {
+    id: "challenge-ai-digit-recognition",
+    title: "Deep Learning: Handwritten Digit Recognition",
+    category: "Deep Learning",
+    difficulty: "beginner",
+    description:
+      "Build a neural network to recognize handwritten digits (0-9) from the MNIST dataset. Create a multi-layer perceptron or CNN that achieves at least 95% accuracy. Submit your model architecture and training results. Access the interactive challenge at /challenges/ai-digit-recognition",
+    flag: "flag{digit_recognition_complete}",
+    points: 220,
+    resources: ["/challenges/ai-digit-recognition"],
+  },
+  {
+    id: "challenge-ai-image-classification",
+    title: "Deep Learning: Image Classification with CNNs",
+    category: "Deep Learning",
+    difficulty: "intermediate",
+    description:
+      "Build a Convolutional Neural Network (CNN) to classify images into multiple categories. Use transfer learning or build from scratch. Achieve high accuracy on a custom dataset. Submit your model architecture, training curves, and classification results. Access the interactive challenge at /challenges/ai-image-classification",
+    flag: "flag{image_classification_complete}",
+    points: 280,
+    resources: ["/challenges/ai-image-classification"],
+  },
+  {
+    id: "challenge-ai-sentiment-analysis",
+    title: "NLP: Sentiment Analysis System",
+    category: "Natural Language Processing",
+    difficulty: "beginner",
+    description:
+      "Build a sentiment analysis system that classifies text as positive, negative, or neutral. Use traditional ML or deep learning approaches. Process real-world text data and achieve good accuracy. Submit your model with evaluation metrics. Access the interactive challenge at /challenges/ai-sentiment-analysis",
+    flag: "flag{sentiment_analysis_complete}",
+    points: 230,
+    resources: ["/challenges/ai-sentiment-analysis"],
+  },
+  {
+    id: "challenge-ai-text-classification",
+    title: "NLP: Text Classification with Transformers",
+    category: "Natural Language Processing",
+    difficulty: "intermediate",
+    description:
+      "Build a text classification system using transformer models (BERT, GPT, or similar). Classify documents into multiple categories. Fine-tune a pre-trained model or train from scratch. Submit your model with accuracy metrics and confusion matrix. Access the interactive challenge at /challenges/ai-text-classification",
+    flag: "flag{text_classification_complete}",
+    points: 300,
+    resources: ["/challenges/ai-text-classification"],
+  },
+  {
+    id: "challenge-ai-object-detection",
+    title: "Computer Vision: Object Detection System",
+    category: "Computer Vision",
+    difficulty: "intermediate",
+    description:
+      "Build an object detection system that can identify and locate multiple objects in images. Use YOLO, SSD, or similar architectures. Detect objects in real-world images and draw bounding boxes. Submit your model with mAP (mean Average Precision) scores. Access the interactive challenge at /challenges/ai-object-detection",
+    flag: "flag{object_detection_complete}",
+    points: 320,
+    resources: ["/challenges/ai-object-detection"],
+  },
+  {
+    id: "challenge-ai-face-recognition",
+    title: "Computer Vision: Face Recognition System",
+    category: "Computer Vision",
+    difficulty: "advanced",
+    description:
+      "Build a face recognition system that can identify individuals from images. Implement face detection, feature extraction, and matching. Handle variations in lighting, pose, and expression. Submit your system with accuracy metrics and test results. Access the interactive challenge at /challenges/ai-face-recognition",
+    flag: "flag{face_recognition_complete}",
+    points: 350,
+    resources: ["/challenges/ai-face-recognition"],
+  },
+  {
+    id: "challenge-ai-text-generation",
+    title: "Generative AI: Text Generation Bot",
+    category: "Generative AI",
+    difficulty: "intermediate",
+    description:
+      "Build a text generation system using GPT or similar language models. Generate coherent and contextually relevant text from prompts. Fine-tune a pre-trained model or use prompt engineering. Submit generated samples and evaluation metrics. Access the interactive challenge at /challenges/ai-text-generation",
+    flag: "flag{text_generation_complete}",
+    points: 270,
+    resources: ["/challenges/ai-text-generation"],
+  },
+  {
+    id: "challenge-ai-image-generation",
+    title: "Generative AI: Image Generation with Stable Diffusion",
+    category: "Generative AI",
+    difficulty: "advanced",
+    description:
+      "Build an image generation system using Stable Diffusion or similar models. Generate high-quality images from text prompts. Fine-tune the model for specific styles or domains. Submit generated images and evaluation metrics (FID, IS scores). Access the interactive challenge at /challenges/ai-image-generation",
+    flag: "flag{image_generation_complete}",
+    points: 380,
+    resources: ["/challenges/ai-image-generation"],
+  },
+  {
+    id: "challenge-ai-chatbot",
+    title: "Generative AI: AI Chatbot with RAG",
+    category: "Generative AI",
+    difficulty: "advanced",
+    description:
+      "Build an intelligent chatbot using Large Language Models with Retrieval-Augmented Generation (RAG). The chatbot should answer questions using a knowledge base. Implement document retrieval, context injection, and response generation. Submit your chatbot with test conversations. Access the interactive challenge at /challenges/ai-chatbot",
+    flag: "flag{rag_chatbot_complete}",
+    points: 400,
+    resources: ["/challenges/ai-chatbot"],
+  },
+  {
+    id: "challenge-ai-q-learning",
+    title: "Reinforcement Learning: Q-Learning Agent",
+    category: "Reinforcement Learning",
+    difficulty: "intermediate",
+    description:
+      "Build a Q-Learning agent that can solve a reinforcement learning environment (e.g., Frozen Lake, CartPole). Implement the Q-learning algorithm from scratch. Train the agent to achieve optimal policy. Submit your agent's performance metrics and learned Q-table. Access the interactive challenge at /challenges/ai-q-learning",
+    flag: "flag{q_learning_complete}",
+    points: 290,
+    resources: ["/challenges/ai-q-learning"],
+  },
+  {
+    id: "challenge-ai-dqn-game",
+    title: "Reinforcement Learning: Deep Q-Network Game Agent",
+    category: "Reinforcement Learning",
+    difficulty: "advanced",
+    description:
+      "Build a Deep Q-Network (DQN) agent that can play Atari games or similar environments. Implement experience replay, target networks, and epsilon-greedy exploration. Train the agent to achieve human-level or better performance. Submit training curves and gameplay videos. Access the interactive challenge at /challenges/ai-dqn-game",
+    flag: "flag{dqn_agent_complete}",
+    points: 420,
+    resources: ["/challenges/ai-dqn-game"],
+  },
+  {
+    id: "challenge-ai-ml-pipeline",
+    title: "End-to-End: Complete ML Pipeline",
+    category: "Machine Learning",
+    difficulty: "intermediate",
+    description:
+      "Build a complete machine learning pipeline from data collection to deployment. Include data preprocessing, feature engineering, model training, evaluation, and deployment. Use MLOps best practices. Submit your pipeline with documentation and deployment instructions. Access the interactive challenge at /challenges/ai-ml-pipeline",
+    flag: "flag{ml_pipeline_complete}",
+    points: 340,
+    resources: ["/challenges/ai-ml-pipeline"],
+  },
+  {
+    id: "challenge-ai-recommendation",
+    title: "End-to-End: AI-Powered Recommendation System",
+    category: "Machine Learning",
+    difficulty: "advanced",
+    description:
+      "Build a recommendation system using collaborative filtering, content-based filtering, or deep learning. Handle cold-start problems and scalability. Deploy the system and provide recommendations for users. Submit your system with evaluation metrics (precision, recall, NDCG). Access the interactive challenge at /challenges/ai-recommendation",
+    flag: "flag{recommendation_system_complete}",
+    points: 360,
+    resources: ["/challenges/ai-recommendation"],
+  },
+];
+
+// Combine all tasks
+const allSeedTasks: Task[] = [...cybersecuritySeedTasks, ...aiSeedTasks];
+
 // Lazy database initialization
 let seeded = false;
 let seedingPromise: Promise<void> | null = null;
@@ -318,7 +490,7 @@ const seedTasksIfNeeded = async () => {
     
     // Always try to insert/update all tasks - ON CONFLICT will update existing ones
     // This ensures new challenges are added and existing ones are updated
-    for (const task of cybersecuritySeedTasks) {
+    for (const task of allSeedTasks) {
       await db`
         INSERT INTO tasks (id, title, category, difficulty, description, flag, points, resources)
         VALUES (${task.id}, ${task.title}, ${task.category}, ${task.difficulty}, ${task.description}, ${task.flag}, ${task.points}, ${JSON.stringify(task.resources)})
@@ -887,7 +1059,7 @@ export const listTasks = async (): Promise<Task[]> => {
   
   // Always ensure all seed tasks are present (add/update new challenges)
   // This allows new challenges to be added even if database already has tasks
-  for (const task of cybersecuritySeedTasks) {
+  for (const task of allSeedTasks) {
     await db`
       INSERT INTO tasks (id, title, category, difficulty, description, flag, points, resources)
       VALUES (${task.id}, ${task.title}, ${task.category}, ${task.difficulty}, ${task.description}, ${task.flag}, ${task.points}, ${JSON.stringify(task.resources)})

@@ -1191,7 +1191,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                           <span className="flex flex-col">
                             <span className="font-semibold text-slate-900">{task.title}</span>
                             <span className="text-xs uppercase text-slate-500">
-                              {task.category} · {task.points} pts
+                              {task.id?.startsWith("challenge-ai-") ? "AI" : "Cyber Security"} · {task.category} · {task.points} pts · {task.difficulty ? task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1) : task.difficulty}
                             </span>
                           </span>
                         </label>
@@ -1293,7 +1293,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                         <span className="flex flex-col">
                           <span className="font-semibold text-slate-900">{task.title}</span>
                           <span className="text-xs uppercase text-slate-500">
-                            {task.category} · {task.points} pts
+                            {task.id?.startsWith("challenge-ai-") ? "AI" : "Cyber Security"} · {task.category} · {task.points} pts · {task.difficulty ? task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1) : task.difficulty}
                           </span>
                         </span>
                       </label>
@@ -1379,9 +1379,20 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                       </button>
                     )}
                     <div className="flex flex-wrap items-center justify-between gap-y-1 text-xs uppercase tracking-wide text-slate-400">
-                      <span>{task.category}</span>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            task.id?.startsWith("challenge-ai-")
+                              ? "bg-violet-100 text-violet-700"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {task.id?.startsWith("challenge-ai-") ? "AI" : "Cyber Security"}
+                        </span>
+                        <span>{task.category}</span>
+                      </span>
                       <span className="font-semibold text-slate-600">
-                        {task.points} pts · {task.difficulty}
+                        {task.points} pts · {task.difficulty ? task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1) : task.difficulty}
                       </span>
                     </div>
                     <h3 className="mt-2 text-lg font-semibold">{task.title}</h3>
