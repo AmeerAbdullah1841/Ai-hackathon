@@ -81,7 +81,7 @@ const difficulties = [
 
 const jsonHeaders = { "Content-Type": "application/json" } as const;
 
-const SIGNIN_BG_IMAGE = "/cs9.jpg";
+const SIGNIN_BG_IMAGE = "/cat.jpg";
 
 async function request<T>(
   input: RequestInfo,
