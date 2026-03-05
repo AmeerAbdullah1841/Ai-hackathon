@@ -2,22 +2,30 @@
 
 import Link from "next/link";
 
+const BG_IMAGE = "/arc2.jpg";
+
 export function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-10 pt-24">
-      <div className="w-full max-w-4xl text-center">
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-10 pt-24">
+      {/* Background image - no overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${BG_IMAGE}')` }}
+        aria-hidden
+      />
+      <div className="relative z-10 w-full max-w-4xl text-center">
         {/* Main Title */}
         <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 tracking-tight">
           AI HACKATHON
         </h1>
         
         {/* Subtitle */}
-        <p className="text-xl md:text-2xl text-slate-300 mb-4 max-w-2xl mx-auto">
+        <p className="text-xl md:text-2xl text-white mb-4 max-w-2xl mx-auto">
           Compete, Learn, and Innovate with AI Challenges
         </p>
         
         {/* Description */}
-        <p className="text-base md:text-lg text-slate-400 mb-12 max-w-xl mx-auto">
+        <p className="text-base md:text-lg text-white mb-12 max-w-xl mx-auto">
           Join the ultimate AI hackathon experience. Test your skills, solve challenging problems, and climb the leaderboard.
         </p>
 
@@ -65,4 +73,5 @@ export function LandingPage() {
     </div>
   );
 }
+
 

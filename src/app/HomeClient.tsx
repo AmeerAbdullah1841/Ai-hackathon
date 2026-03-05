@@ -81,6 +81,8 @@ const difficulties = [
 
 const jsonHeaders = { "Content-Type": "application/json" } as const;
 
+const SIGNIN_BG_IMAGE = "/cs9.jpg";
+
 async function request<T>(
   input: RequestInfo,
   init?: RequestInit,
@@ -670,8 +672,14 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
 
   if (adminStatus !== "authenticated") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-10 text-slate-900">
-        <div className="w-full max-w-3xl rounded-3xl bg-white p-8 shadow">
+      <div className="relative flex min-h-screen items-center justify-center px-4 py-10 text-slate-900">
+        {/* Background image - no overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${SIGNIN_BG_IMAGE}')` }}
+          aria-hidden
+        />
+        <div className="relative z-10 w-full max-w-3xl rounded-3xl bg-white p-8 shadow">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-slate-400">
