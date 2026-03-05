@@ -679,13 +679,13 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
           style={{ backgroundImage: `url('${SIGNIN_BG_IMAGE}')` }}
           aria-hidden
         />
-        <div className="relative z-10 w-full max-w-3xl rounded-3xl bg-white p-8 shadow">
+        <div className="relative z-10 w-full max-w-3xl border-1 border-white rounded-3xl bg-black p-8 shadow">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-slate-400">
                 Secure Access
               </p>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+              <h1 className="mt-2 text-3xl font-semibold text-white">
                 Choose how you want to sign in
               </h1>
             </div>
@@ -732,7 +732,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                       }))
                     }
                     placeholder="Admin username"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                    className="w-full rounded-xl border border-slate-200 bg-black text-white px-4 py-3"
                     required
                   />
                   <input
@@ -745,7 +745,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                       }))
                     }
                     placeholder="Password"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                    className="w-full rounded-xl border border-slate-200 bg-black text-white px-4 py-3"
                     required
                   />
                   <button
@@ -778,7 +778,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                     setTeamLogin((current) => ({ ...current, username: event.target.value }))
                   }
                   placeholder="Team username"
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  className="rounded-xl border border-slate-200 bg-black text-white px-3 py-2"
                   required
                 />
                 <input
@@ -788,7 +788,7 @@ export function HomeClient({ initialAdminStatus }: HomeClientProps) {
                     setTeamLogin((current) => ({ ...current, password: event.target.value }))
                   }
                   placeholder="Password"
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  className="rounded-xl border border-slate-200 px-3 bg-black text-white py-2"
                   required
                 />
                 <button
