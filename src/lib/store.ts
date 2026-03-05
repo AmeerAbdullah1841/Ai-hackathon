@@ -469,6 +469,117 @@ const aiSeedTasks: Task[] = [
     points: 360,
     resources: ["/challenges/ai-recommendation"],
   },
+  // AI MCQ Challenges (Beginner)
+  {
+    id: "challenge-ai-mcq-1",
+    title: "MCQ: AI Basics & Types of Learning",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "Test your understanding of artificial intelligence fundamentals and types of machine learning. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-1",
+    flag: "flag{mcq_ai_basics_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-1"],
+  },
+  {
+    id: "challenge-ai-mcq-2",
+    title: "MCQ: Machine Learning Introduction",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "Supervised vs unsupervised learning, key ML concepts. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-2",
+    flag: "flag{mcq_ml_intro_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-2"],
+  },
+  {
+    id: "challenge-ai-mcq-3",
+    title: "MCQ: Neural Networks Basics",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "Neurons, layers, activation functions. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-3",
+    flag: "flag{mcq_nn_basics_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-3"],
+  },
+  {
+    id: "challenge-ai-mcq-4",
+    title: "MCQ: Data & Training Basics",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "Training/test split, overfitting, data quality. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-4",
+    flag: "flag{mcq_data_training_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-4"],
+  },
+  {
+    id: "challenge-ai-mcq-5",
+    title: "MCQ: Python & AI Libraries",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "NumPy, Pandas, scikit-learn basics. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-5",
+    flag: "flag{mcq_python_ai_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-5"],
+  },
+  {
+    id: "challenge-ai-mcq-6",
+    title: "MCQ: Classification vs Regression",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "When to use classification or regression, common algorithms. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-6",
+    flag: "flag{mcq_class_reg_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-6"],
+  },
+  {
+    id: "challenge-ai-mcq-7",
+    title: "MCQ: Deep Learning Introduction",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "CNNs, use cases, deep vs shallow networks. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-7",
+    flag: "flag{mcq_dl_intro_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-7"],
+  },
+  {
+    id: "challenge-ai-mcq-8",
+    title: "MCQ: Natural Language Processing Basics",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "What is NLP, applications, basic concepts. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-8",
+    flag: "flag{mcq_nlp_basics_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-8"],
+  },
+  {
+    id: "challenge-ai-mcq-9",
+    title: "MCQ: Ethics in AI",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "Bias, fairness, and responsible AI. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-9",
+    flag: "flag{mcq_ethics_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-9"],
+  },
+  {
+    id: "challenge-ai-mcq-10",
+    title: "MCQ: AI in Everyday Life",
+    category: "AI MCQ",
+    difficulty: "beginner",
+    description:
+      "Real-world AI applications and examples. Multiple choice questions. Access the interactive challenge at /challenges/ai-mcq-10",
+    flag: "flag{mcq_ai_life_complete}",
+    points: 100,
+    resources: ["/challenges/ai-mcq-10"],
+  },
 ];
 
 // Combine all tasks
